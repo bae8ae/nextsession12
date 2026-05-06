@@ -6,12 +6,9 @@ function TeamQuiz({ teamName, members }) {
   // 문제 3개를 배열로 만들어 둠. 정답(answerIndex) 은 members 배열에서의 인덱스로 표시.
   // 보기는 따로 안 적고 props.members 를 그대로 쓸 거라서 여기에는 질문이랑 정답만 둠.
   const questions = [
-    // 0번 멤버를 정답으로 두는 문제 — "커피 많이 마시는 사람" 같은 가벼운 주제로
-    { q: '우리 팀에서 커피 가장 많이 마시는 사람은?', answerIndex: 0 },
-    // 1번 멤버 정답 — 회의 때 농담 제일 많이 던지는 사람
-    { q: '회의 때 농담을 가장 많이 던지는 사람은?', answerIndex: 1 },
-    // 2번 멤버 정답 — 발표하면서 떨림이 가장 적은 사람
-    { q: '발표할 때 가장 안 떠는 사람은?', answerIndex: 2 },
+    { q: '반응속도가 제일 빠른 사람?', answerIndex: 3 },
+    { q: '정병 연애를 했던 사람은?', answerIndex: 3 },
+    { q: '연애 10번 넘게 한 사람?', answerIndex: 3 },
   ]
 
   // 이 state 는 "지금 몇 번째 문제를 풀고 있는지" 를 의미함. 0~2 까지 가고 3 되면 결과 화면.
