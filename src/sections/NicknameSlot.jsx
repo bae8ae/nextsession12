@@ -72,111 +72,228 @@ function NicknameSlot({ teamName, members }) {
     setIsSpinning(false)
   }
 
-  return (
-    // 래퍼 div — 가운데 정렬, 24px 패딩
-    <div style={{ padding: '24px', fontFamily: 'sans-serif', textAlign: 'center' }}>
-      {/* 헤더 — 팀명 표시 */}
-      <h2>🎰 {teamName} 팀 별명 슬롯머신</h2>
-      {/* 안내 문구 */}
-      <p style={{ color: '#666' }}>돌리기를 눌러서 멤버 + 별명 조합을 뽑아보세요</p>
+  // 카지노 머신 본체 색상 — 자주 쓰는 값을 변수로 빼서 가독성 좋게
+  // 진한 와인색(외곽 바디) + 골드(테두리 장식) + 검정(릴 안쪽) 조합이 카지노 느낌의 정석
+  const bodyRed = 'linear-gradient(180deg, #b71c1c 0%, #7f0000 100%)'
+  const goldEdge = 'linear-gradient(180deg, #ffe082 0%, #ffb300 50%, #ff8f00 100%)'
+  const reelBg = 'linear-gradient(180deg, #1a1a1a 0%, #000 50%, #1a1a1a 100%)'
 
-      {/* 슬롯 두 칸을 가로로 나란히 배치하는 컨테이너 */}
+  return (
+    // 래퍼 div — 가운데 정렬, 양옆 패딩
+    <div style={{ padding: '24px 16px', fontFamily: 'sans-serif', textAlign: 'center' }}>
+      {/* 안내 문구 (머신 위 작은 헤더 역할) */}
+      <p style={{ color: '#666', marginBottom: '16px' }}>
+        레버를 당겨서 {teamName} 팀 별명 조합을 뽑아보세요!
+      </p>
+
+      {/* 머신 외형 컨테이너 — 와인색 본체 + 골드 테두리로 카지노 머신 실루엣 */}
       <div
         style={{
-          // flex 가로 배치
-          display: 'flex',
-          // 가로 가운데 정렬
-          justifyContent: 'center',
-          // 슬롯 사이 간격 16px
-          gap: '16px',
-          // 위아래 32px 여백
-          margin: '32px 0',
+          // 머신 폭 — 화면이 좁아도 안 깨지게 max 480
+          maxWidth: '480px',
+          // margin: '0 auto' — 좌우 가운데 정렬
+          margin: '0 auto',
+          // 머신 본체 배경 — 위에서 만든 와인색 그라데이션
+          background: bodyRed,
+          // 라운드 — 윗부분은 더 둥글게(돔 모양), 아래는 살짝 둥글게
+          borderRadius: '32px 32px 20px 20px',
+          // 골드 두꺼운 테두리 — solid 색은 그라데이션 안 먹어서 box-shadow 로 골드 띠 시뮬레이션
+          // 안쪽 어두운 그림자 + 바깥쪽 골드 라인 + 입체감용 그림자 세트
+          boxShadow: '0 0 0 6px #d4a017, 0 0 0 9px #5d3a00, 0 20px 40px rgba(0,0,0,0.4), inset 0 0 30px rgba(0,0,0,0.4)',
+          // 안쪽 패딩 — 머신 내부 부품들 위치 조정
+          padding: '24px 24px 28px',
+          // 글자색 흰색 (어두운 본체 위라서)
+          color: '#fff',
+          // 위치 기준점 — 자식 요소(전구 등) absolute 배치할 때 기준
+          position: 'relative',
         }}
       >
-        {/* 왼쪽 슬롯 — 멤버 이름 표시 */}
+        {/* 상단 마퀴(JACKPOT 간판) — 골드 그라데이션 + 깜빡이 느낌 */}
         <div
           style={{
-            // 슬롯 크기 고정
-            width: '180px',
-            height: '120px',
-            // 두꺼운 테두리로 슬롯 느낌
-            border: '3px solid #333',
+            // 골드 그라데이션 배경
+            background: goldEdge,
+            // 검정 글씨가 골드 위에 가장 잘 보임
+            color: '#3e2723',
+            // 라운드 + 작은 위아래 패딩
             borderRadius: '12px',
-            // flex 로 안쪽 텍스트 가운데 정렬
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
+            padding: '8px 16px',
+            // 굵은 카지노 폰트 느낌 — serif 계열 + 굵게
+            fontFamily: 'Georgia, serif',
             fontWeight: 'bold',
-            // 삼항 — 회전 중이면 옅은 노랑, 멈춤이면 흰색 배경
-            background: isSpinning ? '#fff8e1' : '#fff',
+            // 글자 크기 살짝 크게
+            fontSize: '22px',
+            // 자간 넓혀서 간판 느낌
+            letterSpacing: '4px',
+            // 입체감용 그림자
+            boxShadow: 'inset 0 0 8px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.3)',
+            // 아래 릴과 간격
+            marginBottom: '20px',
           }}
         >
-          {/* 현재 멤버 이름 출력 */}
-          {currentMember}
+          ★ JACKPOT ★
         </div>
-        {/* 가운데 X 표시 — 두 슬롯이 한 조합임을 시각적으로 표현 */}
-        <div style={{ alignSelf: 'center', fontSize: '24px', color: '#888' }}>×</div>
-        {/* 오른쪽 슬롯 — 별명 표시 */}
-        <div
-          style={{
-            width: '180px',
-            height: '120px',
-            border: '3px solid #333',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            fontWeight: 'bold',
-            // 회전 중이면 옅은 파랑 (왼쪽과 색을 다르게 해서 구분)
-            background: isSpinning ? '#e3f2fd' : '#fff',
-          }}
-        >
-          {/* 현재 별명 출력 */}
-          {currentNickname}
-        </div>
-      </div>
 
-      {/* 버튼 영역 — flex 로 두 버튼을 가운데 정렬 */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
-        {/* 돌리기 버튼 */}
-        <button
-          // 클릭 시 handleSpin 호출 → isSpinning true 로
-          onClick={handleSpin}
-          // 이미 회전 중이면 비활성화 (중복 클릭 막기)
-          disabled={isSpinning}
+        {/* 릴 컨테이너 — 슬롯 두 칸을 검정 패널 안에 가두는 프레임 */}
+        <div
           style={{
-            padding: '12px 32px',
-            fontSize: '16px',
-            borderRadius: '8px',
-            border: '1px solid #888',
-            // 회전 중이면 회색 배경(비활성 표시), 아니면 흰색
-            background: isSpinning ? '#eee' : '#fff',
-            // 회전 중이면 기본 커서, 아니면 클릭 가능 표시
-            cursor: isSpinning ? 'default' : 'pointer',
+            // 검정 그라데이션 — 릴 뒤판
+            background: reelBg,
+            // 라운드
+            borderRadius: '12px',
+            // 패널 안쪽 여백
+            padding: '20px 16px',
+            // 골드 안쪽 테두리 — 카지노 LED 느낌
+            boxShadow: 'inset 0 0 0 3px #d4a017, inset 0 0 20px rgba(0,0,0,0.8)',
+            // 릴 사이 가로 정렬
+            display: 'flex',
+            // 가로 가운데
+            justifyContent: 'center',
+            // 릴 사이 간격
+            gap: '12px',
+            // 가운데 정렬 (세로)
+            alignItems: 'center',
+            // 아래 버튼과 간격
+            marginBottom: '20px',
           }}
         >
-          돌리기
-        </button>
-        {/* 멈추기 버튼 */}
-        <button
-          // 클릭 시 handleStop 호출 → isSpinning false 로
-          onClick={handleStop}
-          // 안 돌고 있으면 비활성화 — !isSpinning 은 isSpinning 이 false 일 때 true
-          disabled={!isSpinning}
+          {/* 왼쪽 릴 — 멤버 이름 */}
+          <div
+            style={{
+              // 릴 크기
+              flex: 1,
+              height: '110px',
+              // 흰색 베이스 + 회전 시 노란 빛 살짝
+              background: isSpinning
+                ? 'linear-gradient(180deg, #fff9c4 0%, #fff 50%, #fff9c4 100%)'
+                : 'linear-gradient(180deg, #f5f5f5 0%, #fff 50%, #f5f5f5 100%)',
+              // 글자 검정
+              color: '#222',
+              // 라운드 — 릴 카드 느낌
+              borderRadius: '8px',
+              // flex 로 가운데 정렬
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              // 큰 글씨로 시선 집중
+              fontSize: '28px',
+              fontWeight: 'bold',
+              // 회전 중일 때 살짝 흐릿한 느낌 — blur 미세하게
+              filter: isSpinning ? 'blur(0.6px)' : 'none',
+              // 안쪽 그림자로 깊이감
+              boxShadow: 'inset 0 4px 8px rgba(0,0,0,0.2), inset 0 -4px 8px rgba(0,0,0,0.2)',
+              // 깜빡임 같은 부드러운 전환
+              transition: 'background 0.2s ease',
+            }}
+          >
+            {currentMember}
+          </div>
+          {/* 가운데 구분 — × 대신 골드 점 두 개로 슬롯 구획감 */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ffb300', boxShadow: '0 0 6px #ffb300' }}></span>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ffb300', boxShadow: '0 0 6px #ffb300' }}></span>
+          </div>
+          {/* 오른쪽 릴 — 별명 */}
+          <div
+            style={{
+              flex: 1,
+              height: '110px',
+              background: isSpinning
+                ? 'linear-gradient(180deg, #bbdefb 0%, #fff 50%, #bbdefb 100%)'
+                : 'linear-gradient(180deg, #f5f5f5 0%, #fff 50%, #f5f5f5 100%)',
+              color: '#222',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+              fontWeight: 'bold',
+              filter: isSpinning ? 'blur(0.6px)' : 'none',
+              boxShadow: 'inset 0 4px 8px rgba(0,0,0,0.2), inset 0 -4px 8px rgba(0,0,0,0.2)',
+              transition: 'background 0.2s ease',
+            }}
+          >
+            {currentNickname}
+          </div>
+        </div>
+
+        {/* 결과 안내(스코어보드 느낌) — 회전 안 할 때만 결과 강조 */}
+        <div
           style={{
-            padding: '12px 32px',
-            fontSize: '16px',
+            // 어두운 패널 위 골드 글씨
+            background: 'rgba(0,0,0,0.4)',
+            color: '#ffd54f',
             borderRadius: '8px',
-            border: '1px solid #888',
-            // 안 돌고 있으면 회색, 돌고 있으면 흰색
-            background: !isSpinning ? '#eee' : '#fff',
-            cursor: !isSpinning ? 'default' : 'pointer',
+            padding: '8px',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            letterSpacing: '2px',
+            marginBottom: '20px',
+            // 안쪽 골드 라인
+            boxShadow: 'inset 0 0 0 1px #d4a017',
           }}
         >
-          멈추기
-        </button>
+          {/* 회전 중이면 "SPINNING…", 아니면 현재 조합 */}
+          {isSpinning ? '🎲 SPINNING…' : `★ ${currentMember} × ${currentNickname} ★`}
+        </div>
+
+        {/* 버튼 영역 — 머신 하단 컨트롤 패널 */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
+          {/* 돌리기(SPIN) 버튼 — 빨간 큰 버튼이 카지노 머신 시그니처 */}
+          <button
+            onClick={handleSpin}
+            disabled={isSpinning}
+            style={{
+              // 둥근 알약 모양
+              padding: '14px 36px',
+              borderRadius: '999px',
+              // 빨간 그라데이션 — 돌고 있으면 어둡게
+              background: isSpinning
+                ? 'linear-gradient(180deg, #757575 0%, #424242 100%)'
+                : 'linear-gradient(180deg, #ff5252 0%, #c62828 100%)',
+              color: '#fff',
+              // 골드 테두리
+              border: '3px solid #ffb300',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              letterSpacing: '3px',
+              cursor: isSpinning ? 'default' : 'pointer',
+              // 입체 그림자
+              boxShadow: '0 4px 0 #5d3a00, 0 6px 12px rgba(0,0,0,0.4)',
+              // 글자 그림자 — 살짝 입체감
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+              transition: 'transform 0.1s ease',
+              // 누를 때 살짝 들어가는 느낌
+              transform: isSpinning ? 'translateY(2px)' : 'translateY(0)',
+            }}
+          >
+            🎰 SPIN
+          </button>
+          {/* 멈추기(STOP) 버튼 — 검정 + 골드 라인 */}
+          <button
+            onClick={handleStop}
+            disabled={!isSpinning}
+            style={{
+              padding: '14px 36px',
+              borderRadius: '999px',
+              background: !isSpinning
+                ? 'linear-gradient(180deg, #757575 0%, #424242 100%)'
+                : 'linear-gradient(180deg, #424242 0%, #000 100%)',
+              color: '#ffd54f',
+              border: '3px solid #ffb300',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              letterSpacing: '3px',
+              cursor: !isSpinning ? 'default' : 'pointer',
+              boxShadow: '0 4px 0 #5d3a00, 0 6px 12px rgba(0,0,0,0.4)',
+              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+              transition: 'transform 0.1s ease',
+              transform: !isSpinning ? 'translateY(2px)' : 'translateY(0)',
+            }}
+          >
+            ✋ STOP
+          </button>
+        </div>
       </div>
     </div>
   )
