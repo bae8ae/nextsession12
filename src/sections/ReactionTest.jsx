@@ -76,6 +76,56 @@ function ReactionTest({ teamName }) {
     setStatus('ready')
   }
 
+  // 이 effect 는 키보드 스페이스바를 마우스 클릭이랑 똑같이 동작하게 해주는 용도.
+  // 발표 때 마우스 안 잡고도 손가락으로 바로 누를 수 있어서 더 자연스러움.
+  // status / startedAt / bestMs 가 바뀌면 핸들러가 참조하는 값이 달라지니까 의존성에 다 포함.
+  useEffect(() => {
+    // 실제로 keydown 일 때 실행될 핸들러. status 에 따라 분기해서 적절한 동작 수행.
+    const handleKeyDown = (e) => {
+      // 스페이스바가 아니면 무시 (다른 키 눌러도 게임 진행 안 되게)
+      if (e.code !== 'Space') return
+      // 스페이스바 누르면 페이지가 스크롤되는 기본 동작이 있어서 그건 막아줌
+      e.preventDefault()
+
+      // ready: 아직 시작 전 → 시작 버튼 누른 것과 동일하게 대기 상태로 진입
+      if (status === 'ready') {
+        // 이전 회차 결과 정리
+        setReactionMs(null)
+        // 빨강 대기 상태로 → 위쪽 useEffect 가 랜덤 타이머 걸어줌
+        setStatus('waiting')
+        return
+      }
+      // waiting: 빨강일 때 누르면 너무 빨리 누른 케이스
+      if (status === 'waiting') {
+        setStatus('tooSoon')
+        return
+      }
+      // go: 초록일 때 누른 게 진짜 측정 타이밍
+      if (status === 'go') {
+        // 박스 클릭 핸들러랑 동일한 계산 로직
+        const ms = Math.round(performance.now() - startedAt)
+        setReactionMs(ms)
+        // 최고 기록 갱신 조건도 동일
+        if (bestMs === null || ms < bestMs) {
+          setBestMs(ms)
+        }
+        setStatus('result')
+        return
+      }
+      // result / tooSoon: 결과나 실패 화면에서는 다음 회차 준비 상태로 리셋
+      if (status === 'result' || status === 'tooSoon') {
+        setStatus('ready')
+      }
+    }
+
+    // window 전역에 키 리스너 등록 — 박스에 포커스 없어도 어디서든 스페이스바가 먹히도록
+    window.addEventListener('keydown', handleKeyDown)
+    // 컴포넌트 언마운트 또는 의존성 변경으로 재실행될 때 이전 리스너 깔끔히 제거
+    // 안 그러면 리스너가 중복 등록돼서 한 번 누른 게 여러 번 처리되는 버그 발생
+    return () => window.removeEventListener('keydown', handleKeyDown)
+    // 핸들러 안에서 status, startedAt, bestMs 를 참조하니까 이 셋이 바뀌면 새 클로저로 다시 등록
+  }, [status, startedAt, bestMs])
+
   // status 에 따라 박스 배경색을 결정 — switch 보다 객체 매핑이 보기 편해서 이렇게 함
   const boxColor = {
     // 시작 전엔 회색
@@ -92,9 +142,9 @@ function ReactionTest({ teamName }) {
 
   // status 에 따라 박스 안에 보여줄 텍스트도 같이 결정
   const boxText = {
-    ready: '시작 버튼을 누르세요',
+    ready: '시작 버튼 또는 Space',
     waiting: '기다리세요…',
-    go: '지금 클릭!',
+    go: '지금 클릭 / Space!',
     result: `${reactionMs} ms`,
     tooSoon: '너무 빨라요!',
   }[status]
